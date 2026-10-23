@@ -12,7 +12,7 @@
 const CSV_URL = "";
 
 // 👉 WHATSAPP: 549 + código de área sin 0 + número sin 15. Ej: 5491123456789
-const WHATSAPP_NUMERO = "5491100000000";
+const WHATSAPP_NUMERO = "5491123866890";
 
 // 👉 INSTAGRAM: el usuario, sin @
 const INSTAGRAM_USUARIO = "furiastore";
