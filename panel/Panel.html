@@ -263,12 +263,21 @@
 
   /* ---------- lista ---------- */
   async function cargar() {
+    // Si Google no responde (pasa con varias cuentas abiertas o cookies bloqueadas), avisar en vez de quedar "cargando"
+    const demora = setTimeout(() => {
+      if (state.vestidos.length) return;
+      $("#lista").innerHTML = `<p class="empty">No se pudo conectar con la planilla.<br><br>
+        Si tenés varias cuentas de Google abiertas, abrí el panel en una ventana de incógnito y entrá solo con la cuenta de la tienda.
+        También puede pasar si el navegador bloquea las cookies de terceros: probá desde Chrome o desde el celular.</p>`;
+    }, 20000);
     try {
       const datos = await server("cargarPanel");
+      clearTimeout(demora);
       state.vestidos = datos.vestidos;
       if (datos.sitio) { $("#verSitio").href = datos.sitio; $("#verSitio").hidden = false; }
       pintarLista();
     } catch (e) {
+      clearTimeout(demora);
       $("#lista").innerHTML = `<p class="empty">No se pudo cargar la planilla.<br>${esc(mensajeError(e))}</p>`;
     }
   }
