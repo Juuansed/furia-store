@@ -169,9 +169,9 @@ function placeholderSVG(hex, variante = 0) {
     </defs>
     <rect width="300" height="400" fill="url(#bg)"/>
     <g${zoom}>
-      <path d="M150 40 q0-12 8-12 q7 0 7 7 q0 5-7 8 M114 60 L150 42 L186 60" fill="none" stroke="#cfb68c" stroke-opacity=".5" stroke-width="1.4"/>
+      <path d="M150 40 q0-12 8-12 q7 0 7 7 q0 5-7 8 M114 60 L150 42 L186 60" fill="none" stroke="#c8a24e" stroke-opacity=".5" stroke-width="1.4"/>
       <path d="M131 64 L140 50 M169 64 L160 50" stroke="${hex}" stroke-width="2"/>
-      <g stroke="#cfb68c" stroke-opacity=".35" stroke-width=".8">
+      <g stroke="#c8a24e" stroke-opacity=".35" stroke-width=".8">
         <path d="${falda}" fill="${hex}"/><path d="${falda}" fill="url(#sh)"/>
         <path d="${bodice}" fill="${hex}"/><path d="${bodice}" fill="url(#sh)"/>
       </g>

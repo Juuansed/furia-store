@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Furia Store · Vestidos de fiesta en Pacheco</title>
-  <meta name="description" content="Furia Store: vestidos de fiesta elegantes en General Pacheco. Hipólito Yrigoyen 860. Comprá online con Mercado Pago o consultanos por WhatsApp.">
+  <meta name="description" content="Furia Store: vestidos de fiesta elegantes en General Pacheco. Hipólito Yrigoyen 580. Comprá online con Mercado Pago o consultanos por WhatsApp.">
   <meta name="theme-color" content="#000000">
   <meta property="og:title" content="Furia Store · Vestidos para tu noche">
   <meta property="og:description" content="Vestidos de fiesta elegantes en Pacheco. Mirá el catálogo con precios y stock actualizado.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='32' y='46' font-family='Arial Black,Arial' font-weight='900' font-size='40' fill='%23fff' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ccircle cx='32' cy='32' r='27' fill='none' stroke='%23c8a24e' stroke-width='3'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-weight='700' font-size='34' fill='%23c8a24e' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Parisienne&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -20,9 +20,8 @@
   <!-- ===== Barra superior ===== -->
   <header class="topbar">
     <div class="container topbar-inner">
-      <a href="#inicio" class="logo logo--mini" aria-label="Furia Store, inicio">
-        <span class="logo-word">FURIA</span>
-        <span class="logo-store" aria-hidden="true"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></span>
+      <a href="#inicio" class="brand" aria-label="Furia Store, inicio">
+        <span class="brand-furia">FURIA</span><span class="brand-store">Store</span>
       </a>
       <nav class="nav" aria-label="Secciones">
         <a href="#catalogo">Catálogo</a>
@@ -36,13 +35,54 @@
     <!-- ===== 1. Inicio ===== -->
     <section id="inicio" class="hero">
       <div class="hero-inner">
-        <p class="eyebrow">Boutique de fiesta · Pacheco</p>
-        <!-- Logo armado con texto. Si preferís usar la imagen del logo,
-             subí el archivo como logo.png y reemplazá este bloque por:
-             <img src="logo.png" alt="Furia Store" class="hero-logo-img"> -->
-        <h1 class="logo logo--hero" aria-label="Furia Store">
-          <span class="logo-word">FURIA</span>
-          <span class="logo-store" aria-hidden="true"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></span>
+        <p class="eyebrow">General Pacheco</p>
+        <!-- Logo (emblema dorado) dibujado en SVG. Si tenés el logo en archivo
+             (PNG o SVG con fondo transparente), subilo como logo.png y reemplazá
+             este bloque por: <h1><img src="logo.png" alt="Furia Store" class="emblem"></h1> -->
+        <h1 class="emblem-wrap">
+          <svg class="emblem" viewBox="0 0 400 400" role="img" aria-label="Furia Store, vestidos de fiesta">
+            <defs>
+              <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#e6c97c"/>
+                <stop offset=".5" stop-color="#c8a24e"/>
+                <stop offset="1" stop-color="#a8822f"/>
+              </linearGradient>
+              <path id="leaf" d="M0 0 C4 -7 12 -9 19 -6 C14 0 7 3 0 0 Z"/>
+              <path id="flame" d="M200 64 C195 80 185 88 189 104 C191 113 197 119 200 126 C203 119 209 113 211 104 C215 88 205 80 200 64 Z M200 84 C197 94 193 100 196 110 C197 114 199 117 200 119 C201 117 203 114 204 110 C207 100 203 94 200 84 Z"/>
+              <g id="sprig">
+                <path d="M208 130 C232 126 252 112 282 113 C300 114 312 122 322 130" fill="none" stroke="url(#gold)" stroke-width="2"/>
+                <use href="#leaf" transform="translate(222 127) rotate(-55)"/>
+                <use href="#leaf" transform="translate(232 124) rotate(25)"/>
+                <use href="#leaf" transform="translate(244 118) rotate(-60)"/>
+                <use href="#leaf" transform="translate(256 114) rotate(15)"/>
+                <use href="#leaf" transform="translate(268 112) rotate(-70)"/>
+                <use href="#leaf" transform="translate(282 113) rotate(10)"/>
+                <use href="#leaf" transform="translate(294 115) rotate(-55)"/>
+                <use href="#leaf" transform="translate(306 120) rotate(30)"/>
+                <use href="#leaf" transform="translate(320 129) rotate(-25) scale(.8)"/>
+                <circle cx="330" cy="140" r="2.2"/><circle cx="318" cy="102" r="1.8"/><circle cx="252" cy="98" r="1.6"/>
+              </g>
+            </defs>
+            <g fill="url(#gold)">
+              <circle cx="200" cy="200" r="192" fill="none" stroke="url(#gold)" stroke-width="6"/>
+              <circle cx="200" cy="200" r="180" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+              <!-- adorno superior -->
+              <use href="#flame" fill-rule="evenodd"/>
+              <path d="M184 136 C190 126 210 126 216 136 M184 136 c-5 4 -11 1 -9 -4 M216 136 c5 4 11 1 9 -4 M200 126 V138" fill="none" stroke="url(#gold)" stroke-width="2"/>
+              <use href="#sprig"/>
+              <use href="#sprig" transform="translate(400 0) scale(-1 1)"/>
+              <!-- texto -->
+              <text class="emblem-furia" x="200" y="214" text-anchor="middle">FURIA</text>
+              <path d="M112 240 Q140 236 166 240 M234 240 Q260 236 288 240" fill="none" stroke="url(#gold)" stroke-width="2"/>
+              <text class="emblem-store" x="200" y="252" text-anchor="middle">Store</text>
+              <text class="emblem-sub" x="200" y="294" text-anchor="middle">Vestidos de fiesta</text>
+              <circle cx="88" cy="238" r="2"/><circle cx="96" cy="238" r="2"/><circle cx="304" cy="238" r="2"/><circle cx="312" cy="238" r="2"/>
+              <!-- adorno inferior -->
+              <use href="#sprig" transform="translate(0 452) scale(1 -1)"/>
+              <use href="#sprig" transform="translate(400 452) scale(-1 -1)"/>
+              <use href="#flame" fill-rule="evenodd" transform="translate(200 358) scale(.42 -.42) translate(-200 -64)"/>
+            </g>
+          </svg>
         </h1>
         <span class="hero-rule" aria-hidden="true"></span>
         <p class="tagline">Vestidos para tu noche</p>
@@ -111,7 +151,7 @@
           <li>
             <span class="step-num">04</span>
             <h3>Retiralo en el local</h3>
-            <p>Pasá a buscarlo por Hipólito Yrigoyen 860, Pacheco, en nuestro horario de atención.</p>
+            <p>Pasá a buscarlo por Hipólito Yrigoyen 580, Pacheco, en nuestro horario de atención.</p>
           </li>
         </ol>
 
@@ -127,7 +167,7 @@
           <div class="info-card">
             <h3>Retiro en el local</h3>
             <ul>
-              <li>Retiro sin cargo en Hipólito Yrigoyen 860, Pacheco</li>
+              <li>Retiro sin cargo en Hipólito Yrigoyen 580, Pacheco</li>
               <li>Te esperamos en nuestro horario de atención</li>
               <li>También podés venir a verlos y probártelos</li>
             </ul>
@@ -147,10 +187,10 @@
         <div class="contact-grid">
           <div class="contact-item">
             <h3>Dirección</h3>
-            <p class="contact-big">Hipólito Yrigoyen 860</p>
+            <p class="contact-big">Hipólito Yrigoyen 580</p>
             <p>General Pacheco, Buenos Aires</p>
             <a class="link" target="_blank" rel="noopener"
-               href="https://www.google.com/maps/search/?api=1&query=Hip%C3%B3lito+Yrigoyen+860+General+Pacheco">Cómo llegar →</a>
+               href="https://www.google.com/maps/search/?api=1&query=Hip%C3%B3lito+Yrigoyen+580+General+Pacheco">Cómo llegar →</a>
           </div>
           <div class="contact-item">
             <h3>Horarios</h3>
@@ -178,9 +218,8 @@
 
   <footer class="footer">
     <div class="container footer-inner">
-      <span class="logo logo--mini" aria-hidden="true">
-        <span class="logo-word">FURIA</span>
-        <span class="logo-store"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></span>
+      <span class="brand" aria-hidden="true">
+        <span class="brand-furia">FURIA</span><span class="brand-store">Store</span>
       </span>
       <p>© <span id="year"></span> Furia Store · Pacheco</p>
     </div>

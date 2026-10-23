@@ -11,10 +11,11 @@
   --line-strong: #3a3732;
   --text: #f4f1ec;
   --muted: #9d978e;
-  --accent: #cfb68c;        /* champagne */
-  --accent-soft: rgba(207, 182, 140, .14);
+  --accent: #c8a24e;        /* dorado del logo */
+  --accent-soft: rgba(200, 162, 78, .14);
 
-  --font-logo: "Archivo Black", "Arial Black", Arial, sans-serif;
+  --font-logo: "Cinzel", "Trajan Pro", Georgia, serif;
+  --font-script: "Parisienne", "Segoe Script", cursive;
   --font-title: "Cormorant Garamond", Georgia, serif;
   --font-body: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -56,29 +57,17 @@ fieldset { border: 0; }
   fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round;
 }
 
-/* ---------- Logo (FURIA + STORE vertical) ---------- */
-.logo {
-  display: inline-flex;
-  align-items: stretch;
-  font-family: var(--font-logo);
-  font-weight: 400;
-  color: #fff;
-  line-height: .74;
-  text-transform: uppercase;
-}
-.logo-word { letter-spacing: -.01em; padding-top: .02em; }
-.logo-store {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin-left: .07em;
-  font-size: .158em;
-  line-height: 1;
-  padding: .02em 0 0;
-}
-.logo-store span { display: block; height: 1em; line-height: .78; text-align: center; }
-.logo--mini { font-size: 22px; }
-.logo--hero { font-size: clamp(76px, 25vw, 176px); }
+/* ---------- Logo (emblema dorado: FURIA + Store en cursiva) ---------- */
+.emblem-wrap { line-height: 0; }
+.emblem { width: min(80vw, 380px); height: auto; display: block; }
+.emblem-furia { font-family: var(--font-logo); font-weight: 700; font-size: 80px; letter-spacing: 3px; }
+.emblem-store { font-family: var(--font-script); font-size: 40px; }
+.emblem-sub { font-family: var(--font-script); font-size: 34px; }
+
+.brand { display: inline-flex; align-items: baseline; gap: 6px; color: var(--accent); line-height: 1; }
+.brand-furia { font-family: var(--font-logo); font-weight: 700; font-size: 21px; letter-spacing: .06em; }
+.brand-store { font-family: var(--font-script); font-size: 20px; }
+@media (max-width: 399px) { .brand-store { display: none; } }
 
 /* ---------- Barra superior ---------- */
 .topbar {
@@ -90,10 +79,10 @@ fieldset { border: 0; }
   border-bottom: 1px solid var(--line);
 }
 .topbar-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
-.nav { display: flex; gap: 20px; }
+.nav { display: flex; gap: 14px; }
 .nav a {
   font-size: 11px; font-weight: 400;
-  letter-spacing: .18em; text-transform: uppercase;
+  letter-spacing: .12em; text-transform: uppercase;
   color: var(--muted);
   transition: color .2s;
 }
@@ -112,7 +101,7 @@ fieldset { border: 0; }
 }
 .btn .ico { width: 18px; height: 18px; }
 .btn-accent { background: var(--accent); color: #0a0a0a; }
-.btn-accent:hover { background: #e0caa3; }
+.btn-accent:hover { background: #d8b665; }
 .btn-ghost { border: 1px solid rgba(255, 255, 255, .35); color: var(--text); }
 .btn-ghost:hover { border-color: #fff; }
 .btn:active { transform: scale(.98); }
@@ -125,7 +114,7 @@ fieldset { border: 0; }
   text-align: center;
   padding: 56px 20px 88px;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(207, 182, 140, .11), transparent 70%),
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(200, 162, 78, .11), transparent 70%),
     var(--bg);
   overflow: hidden;
 }
