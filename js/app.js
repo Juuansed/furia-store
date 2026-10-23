@@ -39,6 +39,7 @@ const VESTIDOS_EJEMPLO = [
    ========================================================= */
 
 const STOCK_LABEL = { disponible: "Disponible", ultimas: "Últimas unidades", agotado: "Agotado" };
+const TALLES_FILTRO = ["XS", "S", "M", "L", "XL", "XXL"];
 const TALLE_ORDEN = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4XL", "UNICO", "TALLE UNICO"];
 const COLOR_HEX = [
   ["negro", "#141414"], ["esmeralda", "#0f5e45"], ["perla", "#e8e2d4"], ["marfil", "#ece4d2"],
@@ -348,10 +349,12 @@ function renderGrid() {
 }
 
 function renderFiltros() {
-  const talles = [...new Set(state.products.flatMap(p => p.tallesDisponibles))].sort((a, b) => talleRank(a) - talleRank(b));
-  $("#fTallesGrupo").hidden = !talles.length;
-  $("#fTalles").innerHTML = talles.map(t =>
-    `<button class="chip" type="button" data-talle="${esc(t)}" aria-pressed="${state.filters.talles.has(t)}">${esc(t)}</button>`).join("");
+  // Siempre se muestran los talles habituales; los que no tienen ningún vestido con stock quedan apagados
+  const conStock = new Set(state.products.flatMap(p => p.tallesDisponibles));
+  const talles = [...new Set([...TALLES_FILTRO, ...conStock])].sort((a, b) => talleRank(a) - talleRank(b));
+  $("#fTalles").innerHTML = talles.map(t => conStock.has(t)
+    ? `<button class="chip" type="button" data-talle="${esc(t)}" aria-pressed="${state.filters.talles.has(t)}">${esc(t)}</button>`
+    : `<button class="chip chip--sin" type="button" disabled title="Sin vestidos en este talle por ahora">${esc(t)}</button>`).join("");
 
   const colores = new Map();
   state.products.forEach(p => p.colores.forEach(c => { if (!colores.has(norm(c))) colores.set(norm(c), c); }));
