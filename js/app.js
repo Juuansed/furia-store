@@ -9,7 +9,7 @@
 //    Copiá el link que te da Google y pegalo entre las comillas.
 //    Ejemplo: "https://docs.google.com/spreadsheets/d/e/2PACX-xxxx/pub?output=csv"
 //    Si queda vacío o no carga, se muestran los vestidos de ejemplo.
-const CSV_URL = "";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQdI1Clk1KDl3SxOKm087CXEXvJVr1wMBvxKSprf1QS24P4ccviaw5S9VYbU2-PQJ7F-CT5PDHEOLm/pub?gid=0&single=true&output=csv";
 
 // 👉 WHATSAPP: 549 + código de área sin 0 + número sin 15. Ej: 5491123456789
 const WHATSAPP_NUMERO = "5491123866890";
@@ -506,6 +506,13 @@ async function init() {
   }
 
   state.products = filas.map(normalizarFila).filter(p => p && p.visible);
+  // El id lo numera la planilla sola; por las dudas, si se repite, se le agrega un sufijo
+  const vistos = new Set();
+  state.products.forEach(p => {
+    let id = p.id, n = 2;
+    while (vistos.has(id)) id = `${p.id}-${n++}`;
+    vistos.add(p.id = id);
+  });
 
   if (ejemplo) {
     const n = $("#notice");
