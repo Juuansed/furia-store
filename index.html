@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Furia Store · Vestidos de fiesta en Pacheco</title>
+  <meta name="description" content="Furia Store: vestidos de fiesta elegantes en General Pacheco. Hipólito Yrigoyen 860. Comprá online con Mercado Pago o consultanos por WhatsApp.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:title" content="Furia Store · Vestidos para tu noche">
+  <meta property="og:description" content="Vestidos de fiesta elegantes en Pacheco. Mirá el catálogo con talles y stock actualizado.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='32' y='46' font-family='Arial Black,Arial' font-weight='900' font-size='40' fill='%23fff' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ===== Barra superior ===== -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="#inicio" class="logo logo--mini" aria-label="Furia Store, inicio">
+        <span class="logo-word">FURIA</span>
+        <span class="logo-store" aria-hidden="true"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></span>
+      </a>
+      <nav class="nav" aria-label="Secciones">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#como-comprar">Comprar</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== 1. Inicio ===== -->
+    <section id="inicio" class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">Boutique de fiesta · Pacheco</p>
+        <!-- Logo armado con texto. Si preferís usar la imagen del logo,
+             subí el archivo como logo.png y reemplazá este bloque por:
+             <img src="logo.png" alt="Furia Store" class="hero-logo-img"> -->
+        <h1 class="logo logo--hero" aria-label="Furia Store">
+          <span class="logo-word">FURIA</span>
+          <span class="logo-store" aria-hidden="true"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></span>
+        </h1>
+        <span class="hero-rule" aria-hidden="true"></span>
+        <p class="tagline">Vestidos para tu noche</p>
+        <div class="hero-actions">
+          <a href="#catalogo" class="btn btn-accent">Ver catálogo</a>
+          <a data-wa class="btn btn-ghost">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-wa"/></svg>
+            Consultar por WhatsApp
+          </a>
+        </div>
+      </div>
+      <a href="#catalogo" class="hero-scroll" aria-label="Bajar al catálogo"></a>
+    </section>
+
+    <!-- ===== 2. Catálogo ===== -->
+    <section id="catalogo" class="section">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">La colección</p>
+          <h2>Catálogo</h2>
+        </header>
+
+        <p id="notice" class="notice" hidden></p>
+
+        <div class="toolbar">
+          <button id="filtersOpen" class="toolbar-btn" type="button" aria-haspopup="dialog">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+            Filtros <span id="filtersBadge" class="toolbar-badge" hidden></span>
+          </button>
+          <span id="resultCount" class="toolbar-count" aria-live="polite"></span>
+          <button id="filtersClearInline" class="toolbar-clear" type="button" hidden>Limpiar</button>
+        </div>
+
+        <div id="grid" class="grid" aria-busy="true">
+          <div class="card card--skeleton"></div><div class="card card--skeleton"></div>
+          <div class="card card--skeleton"></div><div class="card card--skeleton"></div>
+        </div>
+        <div id="empty" class="empty" hidden></div>
+      </div>
+    </section>
+
+    <!-- ===== 3. Cómo comprar ===== -->
+    <section id="como-comprar" class="section section--alt">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">Simple y rápido</p>
+          <h2>Cómo comprar</h2>
+        </header>
+
+        <ol class="steps">
+          <li>
+            <span class="step-num">01</span>
+            <h3>Elegí tu vestido</h3>
+            <p>Mirá el catálogo, tocá el vestido que te guste y elegí tu talle.</p>
+          </li>
+          <li>
+            <span class="step-num">02</span>
+            <h3>Pagá o consultá</h3>
+            <p>Pagá online con Mercado Pago, o escribinos por WhatsApp y te asesoramos.</p>
+          </li>
+          <li>
+            <span class="step-num">03</span>
+            <h3>Confirmá tu talle</h3>
+            <p>Mandanos el comprobante por WhatsApp con el talle elegido y te reservamos el vestido.</p>
+          </li>
+          <li>
+            <span class="step-num">04</span>
+            <h3>Recibilo o retiralo</h3>
+            <p>Pasá a buscarlo por el local o coordinamos el envío a tu casa.</p>
+          </li>
+        </ol>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <h3>Medios de pago</h3>
+            <ul>
+              <li>Mercado Pago: tarjetas de crédito, débito y dinero en cuenta</li>
+              <li>Transferencia bancaria</li>
+              <li>Efectivo en el local</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <h3>Envíos y retiro</h3>
+            <ul>
+              <li>Retiro sin cargo en el local, Hipólito Yrigoyen 860, Pacheco</li>
+              <li>Envíos en zona norte por moto, a coordinar</li>
+              <li>Envíos a todo el país por correo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 4. Contacto ===== -->
+    <section id="contacto" class="section">
+      <div class="container contact">
+        <header class="section-head">
+          <p class="eyebrow">Te esperamos</p>
+          <h2>Contacto</h2>
+        </header>
+
+        <div class="contact-grid">
+          <div class="contact-item">
+            <h3>Dirección</h3>
+            <p class="contact-big">Hipólito Yrigoyen 860</p>
+            <p>General Pacheco, Buenos Aires</p>
+            <a class="link" target="_blank" rel="noopener"
+               href="https://www.google.com/maps/search/?api=1&query=Hip%C3%B3lito+Yrigoyen+860+General+Pacheco">Cómo llegar →</a>
+          </div>
+          <div class="contact-item">
+            <h3>Horarios</h3>
+            <!-- Cambiá los horarios acá -->
+            <p>Lunes a viernes · 10 a 13 h y 16 a 20 h</p>
+            <p>Sábados · 10 a 14 h</p>
+          </div>
+          <div class="contact-item">
+            <h3>Redes</h3>
+            <p><a class="link" data-ig target="_blank" rel="noopener"><span data-ig-text></span></a></p>
+            <p><a class="link" data-wa>WhatsApp</a></p>
+          </div>
+        </div>
+
+        <div class="contact-actions">
+          <a data-wa class="btn btn-accent">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-wa"/></svg>
+            Escribinos por WhatsApp
+          </a>
+          <a data-ig class="btn btn-ghost" target="_blank" rel="noopener">Seguinos en Instagram</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span class="logo logo--mini" aria-hidden="true">
+        <span class="logo-word">FURIA</span>
+        <span class="logo-store"><span>S</span><span>T</span><span>O</span><span>R</span><span>E</span></span>
+      </span>
+      <p>© <span id="year"></span> Furia Store · Pacheco</p>
+    </div>
+  </footer>
+
+  <!-- Botón flotante de WhatsApp -->
+  <a data-wa class="wa-float" aria-label="Consultar por WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-wa"/></svg>
+  </a>
+
+  <!-- Detalle del vestido -->
+  <dialog id="detail" class="detail" aria-label="Detalle del vestido">
+    <button class="detail-close" type="button" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="detail-scroll" id="detailBody"></div>
+  </dialog>
+
+  <!-- Panel de filtros -->
+  <dialog id="filters" class="sheet" aria-labelledby="filtersTitle">
+    <div class="sheet-head">
+      <h2 id="filtersTitle">Filtros</h2>
+      <button class="sheet-x" type="button" data-close aria-label="Cerrar filtros">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <fieldset class="fgroup">
+        <legend>Talle</legend>
+        <div id="fTalles" class="chips"></div>
+      </fieldset>
+      <fieldset class="fgroup">
+        <legend>Color</legend>
+        <div id="fColores" class="chips"></div>
+      </fieldset>
+      <fieldset class="fgroup">
+        <legend>Precio</legend>
+        <div class="price-range">
+          <label><span>Desde</span><input id="fMin" type="number" inputmode="numeric" min="0" step="1000" placeholder="$"></label>
+          <span class="price-sep">—</span>
+          <label><span>Hasta</span><input id="fMax" type="number" inputmode="numeric" min="0" step="1000" placeholder="$"></label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="sheet-foot">
+      <button id="filtersClear" class="btn btn-ghost" type="button">Limpiar</button>
+      <button id="filtersApply" class="btn btn-accent" type="button" data-close>Ver vestidos</button>
+    </div>
+  </dialog>
+
+  <!-- Íconos -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ico-wa" viewBox="0 0 24 24">
+      <path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2Zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 4.54 0 8.24 3.7 8.24 8.24 0 4.55-3.7 8.24-8.24 8.24Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.43-.06-.13-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/>
+    </symbol>
+  </svg>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
