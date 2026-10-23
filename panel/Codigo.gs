@@ -15,7 +15,7 @@ const CARPETA_FOTOS = "Furia Store - Fotos";
 // 👉 Dirección de la página (opcional). Si la ponés, el panel muestra un botón "Ver la página".
 const SITIO_URL = "";
 
-const CAMPOS = ["nombre", "precio", "colores", "stock", "foto1", "foto2", "foto3", "link_mercadopago", "visible"];
+const CAMPOS = ["nombre", "precio", "talles", "colores", "stock", "foto1", "foto2", "foto3", "link_mercadopago", "visible"];
 
 
 /* ---------- Página del panel ---------- */
@@ -34,6 +34,20 @@ function hoja_() {
   return ss.getSheetByName(HOJA) || ss.getSheets()[0];
 }
 
+// Si la planilla todavía no tiene la columna "talles", la agrega al final
+function asegurarTalles_(sh) {
+  const titulos = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(t => String(t).trim().toLowerCase());
+  if (!titulos.includes("talles")) sh.getRange(1, sh.getLastColumn() + 1).setValue("talles");
+}
+
+// "S:2, M:0, L:1" → suma de unidades (o null si no hay cantidades)
+function sumarTalles_(texto) {
+  const cantidades = String(texto || "").split(/[,;]/)
+    .map(x => x.split(":")[1]).filter(n => n !== undefined && String(n).trim() !== "")
+    .map(n => parseInt(n, 10) || 0);
+  return cantidades.length ? cantidades.reduce((a, b) => a + b, 0) : null;
+}
+
 // { nombre: númeroDeColumna, ... } a partir de los títulos de la fila 1
 function columnas_(sh) {
   const titulos = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
@@ -44,6 +58,7 @@ function columnas_(sh) {
 
 function cargarPanel() {
   const sh = hoja_();
+  asegurarTalles_(sh);
   const col = columnas_(sh);
   const faltan = ["nombre", "precio"].filter(c => !col[c]);
   if (faltan.length) throw new Error("A la planilla le faltan las columnas: " + faltan.join(", "));
@@ -87,16 +102,20 @@ function guardarVestido(v) {
 
   return conLock_(() => {
     const sh = hoja_();
+    asegurarTalles_(sh);
     const col = columnas_(sh);
     const fila = v.fila ? Number(v.fila) : filaNueva_(sh, col);
     if (v.fila && String(sh.getRange(fila, col.nombre).getValue()).trim() !== String(v.nombreOriginal || "").trim()) {
       throw new Error("La planilla cambió mientras editabas. Volvé a abrir el vestido y probá de nuevo.");
     }
+    const talles = String(v.talles || "").trim();
+    const total = sumarTalles_(talles);
     const valores = {
       nombre,
       precio,
+      talles,
       colores: String(v.colores || "").trim(),
-      stock: Math.max(0, parseInt(v.stock, 10) || 0),
+      stock: total !== null ? total : Math.max(0, parseInt(v.stock, 10) || 0),
       foto1: v.foto1 || "", foto2: v.foto2 || "", foto3: v.foto3 || "",
       link_mercadopago: String(v.link_mercadopago || "").trim(),
       visible: v.visible === false || v.visible === "NO" ? "NO" : "SI",

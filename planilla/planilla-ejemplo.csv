@@ -1,9 +1,9 @@
-id,nombre,precio,colores,stock,foto1,foto2,foto3,link_mercadopago,visible
-1,Alba,85000,Champagne,5,,,,https://mpago.la/ejemplo-alba,SI
-2,Medianoche,98000,Negro,2,,,,https://mpago.la/ejemplo-medianoche,SI
-3,Esmeralda,112000,Verde esmeralda,4,,,,,SI
-4,Rubí,76000,"Rojo, Bordó",1,,,,https://mpago.la/ejemplo-rubi,SI
-5,Ónix,145000,"Negro, Plateado",0,,,,https://mpago.la/ejemplo-onix,SI
-6,Bruma,69000,Azul noche,6,,,,https://mpago.la/ejemplo-bruma,SI
-7,Perla,128000,"Blanco perla, Champagne",3,,,,,SI
-8,Aurora,92000,Dorado,2,,,,https://mpago.la/ejemplo-aurora,SI
+id,nombre,precio,colores,stock,foto1,foto2,foto3,link_mercadopago,visible,talles
+1,Alba,85000,Champagne,5,,,,https://mpago.la/ejemplo-alba,SI,"S:2, M:2, L:1"
+2,Medianoche,98000,Negro,2,,,,https://mpago.la/ejemplo-medianoche,SI,"XS:1, S:1, M:0"
+3,Esmeralda,112000,Verde esmeralda,4,,,,,SI,"S:1, M:1, L:1, XL:1"
+4,Rubí,76000,"Rojo, Bordó",1,,,,https://mpago.la/ejemplo-rubi,SI,"M:1, L:0"
+5,Ónix,145000,"Negro, Plateado",0,,,,https://mpago.la/ejemplo-onix,SI,"S:0, M:0"
+6,Bruma,69000,Azul noche,6,,,,https://mpago.la/ejemplo-bruma,SI,"XS:2, S:2, M:1, L:1"
+7,Perla,128000,"Blanco perla, Champagne",3,,,,,SI,"S:1, M:1, L:1"
+8,Aurora,92000,Dorado,2,,,,https://mpago.la/ejemplo-aurora,SI,"M:1, L:1, XL:0"

@@ -127,6 +127,15 @@
     .big-stepper input { width: 64px; height: 52px; text-align: center; background: transparent; border: 0; font-size: 19px; font-weight: 500; }
     .big-stepper input:focus { outline: none; }
 
+    .talle-rows { display: grid; gap: 8px; margin-top: 14px; }
+    .talle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 8px 8px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .talle-row b { font-weight: 500; font-size: 17px; min-width: 48px; }
+    .talle-row small { color: var(--muted); font-size: 12px; flex: 1; }
+    .talle-row .stepper button { width: 44px; height: 42px; }
+    .talle-row.cero small { color: var(--danger); }
+    .talles-resumen { display: block; font-size: 13px; color: var(--text); margin-top: 2px; letter-spacing: .02em; }
+    .talles-resumen .cero { color: var(--muted); text-decoration: line-through; }
+
     .row-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
     .row-between p { font-size: 15px; }
     .row-between small { display: block; color: var(--muted); font-size: 12px; }
@@ -195,6 +204,17 @@
       </div>
 
       <div class="field">
+        <span class="label">Talles (tocá los que tenés)</span>
+        <div id="talles" class="chips"></div>
+        <div class="add-color">
+          <input id="otroTalle" class="input" type="text" placeholder="Otro talle (ej: 38)" autocomplete="off">
+          <button id="agregarTalle" type="button">Agregar</button>
+        </div>
+        <div id="tallesStock" class="talle-rows"></div>
+        <p id="tallesTotal" class="hint"></p>
+      </div>
+
+      <div class="field" id="campoStock">
         <span class="label">Unidades en stock</span>
         <div class="big-stepper">
           <button type="button" data-step="-1" aria-label="Restar">−</button>
@@ -237,7 +257,7 @@
   const COLOR_HEX = [["negro","#141414"],["esmeralda","#0f5e45"],["perla","#e8e2d4"],["blanco","#efebe3"],["champagne","#d8c29d"],["dorado","#c8a55a"],["plateado","#bfc1c6"],["bordo","#5e1624"],["rojo","#a8152b"],["fucsia","#c0246b"],["rosa","#d9a1ad"],["nude","#d4b09a"],["lila","#a68fc6"],["violeta","#5d3d8a"],["verde","#2d5a3d"],["celeste","#9fc3df"],["azul","#1c2950"],["gris","#6f6f72"]];
 
   const $ = s => document.querySelector(s);
-  const state = { vestidos: [], editando: null, fotos: [], colores: new Set(), ocupado: false };
+  const state = { vestidos: [], editando: null, fotos: [], colores: new Set(), talles: [], ocupado: false };
 
   // google.script.run como promesa
   const server = (fn, ...args) => new Promise((ok, fail) =>
@@ -251,6 +271,23 @@
   const hex = c => (COLOR_HEX.find(([k]) => norm(c).includes(k)) || [, "#8a857d"])[1];
   const estado = s => { s = Number(s); return s <= 0 ? ["agotado", "Agotado"] : s <= 2 ? ["ultimas", "Últimas unidades"] : ["disponible", "Disponible"]; };
   const visible = v => norm(v) !== "no";
+
+  const TALLES_BASE = ["XS", "S", "M", "L", "XL", "XXL", "Único"];
+  const TALLE_ORDEN = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4XL", "UNICO"];
+  function talleRank(t) {
+    const i = TALLE_ORDEN.indexOf(norm(t).toUpperCase());
+    if (i >= 0) return i;
+    const n = parseFloat(t);
+    return Number.isFinite(n) ? 100 + n : 1000;
+  }
+  /* "S:2, M:0, L:1" -> [{ talle: "S", stock: 2 }, ...] */
+  function tallesDe(texto) {
+    return lista(texto).map(x => {
+      const [t, n] = x.split(":").map(s => s.trim());
+      return { talle: t, stock: Math.max(0, parseInt(n, 10) || 0) };
+    }).filter(x => x.talle).sort((a, b) => talleRank(a.talle) - talleRank(b.talle));
+  }
+  const textoTalles = ts => ts.map(t => `${t.talle}:${t.stock}`).join(", ");
 
   function miniatura(url) {
     url = String(url || "").trim();
@@ -318,11 +355,13 @@
             <div class="item-row">
               <div>
                 <span class="stock-label">STOCK · <span class="estado ${cls}">${txt}</span></span>
-                <span class="stepper">
+                ${tallesDe(v.talles).length
+                  ? `<span class="talles-resumen">${tallesDe(v.talles).map(t => `<span class="${t.stock === 0 ? "cero" : ""}">${esc(t.talle)} ${t.stock}</span>`).join(" · ")}</span>`
+                  : `<span class="stepper">
                   <button type="button" data-stock="-1" aria-label="Restar una unidad">−</button>
                   <output>${Number(v.stock) || 0}</output>
                   <button type="button" data-stock="1" aria-label="Sumar una unidad">+</button>
-                </span>
+                </span>`}
               </div>
               <label class="switch">${visible(v.visible) ? "Visible" : "Oculto"}<input type="checkbox" data-visible ${visible(v.visible) ? "checked" : ""}></label>
             </div>
@@ -370,6 +409,9 @@
     $("#fNombre").value = v ? v.nombre : "";
     $("#fPrecio").value = v && v.precio ? Number(v.precio).toLocaleString("es-AR") : "";
     $("#fStock").value = v ? (Number(v.stock) || 0) : 1;
+    state.talles = v ? tallesDe(v.talles) : [];
+    $("#otroTalle").value = "";
+    pintarTalles();
     $("#fMp").value = v ? v.link_mercadopago : "";
     $("#fVisible").checked = v ? visible(v.visible) : true;
     $("#eliminar").hidden = !v;
@@ -454,6 +496,57 @@
   $("#agregarColor").addEventListener("click", agregarColor);
   $("#otroColor").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); agregarColor(); } });
 
+  /* talles: se eligen con chips y cada uno tiene su propio stock */
+  function pintarTalles() {
+    const todos = [...TALLES_BASE];
+    state.talles.forEach(t => { if (!todos.some(x => norm(x) === norm(t.talle))) todos.push(t.talle); });
+    todos.sort((a, b) => talleRank(a) - talleRank(b));
+    const elegido = t => state.talles.some(x => norm(x.talle) === norm(t));
+    $("#talles").innerHTML = todos.map(t =>
+      `<button class="chip" type="button" data-talle="${esc(t)}" aria-pressed="${elegido(t)}">${esc(t)}</button>`).join("");
+
+    state.talles.sort((a, b) => talleRank(a.talle) - talleRank(b.talle));
+    $("#tallesStock").innerHTML = state.talles.map((t, i) => `
+      <div class="talle-row ${t.stock === 0 ? "cero" : ""}">
+        <b>${esc(t.talle)}</b>
+        <small>${t.stock === 0 ? "Sin stock (no se muestra)" : t.stock === 1 ? "1 unidad" : t.stock + " unidades"}</small>
+        <span class="stepper">
+          <button type="button" data-talle-step="-1" data-i="${i}" aria-label="Restar en talle ${esc(t.talle)}">−</button>
+          <output>${t.stock}</output>
+          <button type="button" data-talle-step="1" data-i="${i}" aria-label="Sumar en talle ${esc(t.talle)}">+</button>
+        </span>
+      </div>`).join("");
+
+    const total = state.talles.reduce((s, t) => s + t.stock, 0);
+    $("#tallesTotal").textContent = state.talles.length
+      ? `Total: ${total} ${total === 1 ? "unidad" : "unidades"}. En la página solo aparecen los talles con stock.`
+      : "Si no elegís talles, el vestido se muestra sin opción de talle.";
+    $("#campoStock").hidden = state.talles.length > 0;
+  }
+  $("#talles").addEventListener("click", e => {
+    const b = e.target.closest("[data-talle]");
+    if (!b) return;
+    const i = state.talles.findIndex(x => norm(x.talle) === norm(b.dataset.talle));
+    i >= 0 ? state.talles.splice(i, 1) : state.talles.push({ talle: b.dataset.talle, stock: 1 });
+    pintarTalles();
+  });
+  $("#tallesStock").addEventListener("click", e => {
+    const b = e.target.closest("[data-talle-step]");
+    if (!b) return;
+    const t = state.talles[Number(b.dataset.i)];
+    t.stock = Math.max(0, t.stock + Number(b.dataset.talleStep));
+    pintarTalles();
+  });
+  function agregarTalle() {
+    const t = $("#otroTalle").value.trim().toUpperCase();
+    if (!t) return;
+    if (!state.talles.some(x => norm(x.talle) === norm(t))) state.talles.push({ talle: t, stock: 1 });
+    $("#otroTalle").value = "";
+    pintarTalles();
+  }
+  $("#agregarTalle").addEventListener("click", agregarTalle);
+  $("#otroTalle").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); agregarTalle(); } });
+
   // precio con puntos de miles mientras se escribe
   $("#fPrecio").addEventListener("input", e => {
     const n = e.target.value.replace(/\D/g, "");
@@ -494,7 +587,8 @@
         nombreOriginal: v ? v.nombre : "",
         nombre, precio,
         colores: [...state.colores].join(", "),
-        stock: $("#fStock").value,
+        talles: textoTalles(state.talles),
+        stock: state.talles.length ? state.talles.reduce((s, t) => s + t.stock, 0) : $("#fStock").value,
         foto1: links[0] || "", foto2: links[1] || "", foto3: links[2] || "",
         link_mercadopago: mp,
         visible: $("#fVisible").checked,
