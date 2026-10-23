@@ -225,6 +225,8 @@
   <div id="toast" class="toast" role="status"></div>
 
 <script>
+  /* Ojo: Apps Script borra todo lo que sigue a dos barras en el código (también dentro de textos),
+     así que los links se escriben con barras escapadas y no se usan comentarios de línea. */
   // Si algo falla, mostrarlo en pantalla en vez de quedar en "Cargando…"
   window.addEventListener("error", e => {
     const l = document.getElementById("lista");
@@ -253,7 +255,7 @@
   function miniatura(url) {
     url = String(url || "").trim();
     const m = url.match(/\/d\/([\w-]{15,})/) || url.match(/[?&]id=([\w-]{15,})/);
-    return m ? `https://lh3.googleusercontent.com/d/${m[1]}=w400` : url;
+    return m ? `https:\/\/lh3.googleusercontent.com/d/${m[1]}=w400` : url;
   }
 
   let toastTimer;
@@ -472,7 +474,7 @@
     if (!nombre) { aviso("Poné el nombre del vestido.", true); $("#fNombre").focus(); return; }
     if (!precio) { aviso("Poné el precio.", true); $("#fPrecio").focus(); return; }
     const mp = $("#fMp").value.trim();
-    if (mp && !/^https?:\/\//i.test(mp)) { aviso("El link de Mercado Pago tiene que empezar con https://", true); $("#fMp").focus(); return; }
+    if (mp && !/^https?:\/{2}/i.test(mp)) { aviso("El link de Mercado Pago tiene que empezar con https:\/\/", true); $("#fMp").focus(); return; }
 
     const btn = $("#guardar");
     state.ocupado = true; btn.disabled = true;
