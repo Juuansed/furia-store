@@ -23,14 +23,14 @@ const INSTAGRAM_USUARIO = "furiastore";
    Mismas columnas que la planilla.
    ========================================================= */
 const VESTIDOS_EJEMPLO = [
-  { id: "1", nombre: "Alba",       precio: "85000",  talles: "S, M, L",       colores: "Champagne",               stock: "5", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-alba",       visible: "SI" },
-  { id: "2", nombre: "Medianoche", precio: "98000",  talles: "XS, S, M",      colores: "Negro",                   stock: "2", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-medianoche", visible: "SI" },
-  { id: "3", nombre: "Esmeralda",  precio: "112000", talles: "S, M, L, XL",   colores: "Verde esmeralda",         stock: "4", foto1: "", foto2: "", foto3: "", link_mercadopago: "",                                    visible: "SI" },
-  { id: "4", nombre: "Rubí",       precio: "76000",  talles: "M, L",          colores: "Rojo, Bordó",             stock: "1", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-rubi",       visible: "SI" },
-  { id: "5", nombre: "Ónix",       precio: "145000", talles: "S, M",          colores: "Negro, Plateado",         stock: "0", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-onix",       visible: "SI" },
-  { id: "6", nombre: "Bruma",      precio: "69000",  talles: "XS, S, M, L",   colores: "Azul noche",              stock: "6", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-bruma",      visible: "SI" },
-  { id: "7", nombre: "Perla",      precio: "128000", talles: "S, M, L",       colores: "Blanco perla, Champagne", stock: "3", foto1: "", foto2: "", foto3: "", link_mercadopago: "",                                    visible: "SI" },
-  { id: "8", nombre: "Aurora",     precio: "92000",  talles: "M, L, XL",      colores: "Dorado",                  stock: "2", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-aurora",     visible: "SI" },
+  { id: "1", nombre: "Alba",       precio: "85000",  colores: "Champagne",               stock: "5", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-alba",       visible: "SI" },
+  { id: "2", nombre: "Medianoche", precio: "98000",  colores: "Negro",                   stock: "2", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-medianoche", visible: "SI" },
+  { id: "3", nombre: "Esmeralda",  precio: "112000", colores: "Verde esmeralda",         stock: "4", foto1: "", foto2: "", foto3: "", link_mercadopago: "",                                    visible: "SI" },
+  { id: "4", nombre: "Rubí",       precio: "76000",  colores: "Rojo, Bordó",             stock: "1", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-rubi",       visible: "SI" },
+  { id: "5", nombre: "Ónix",       precio: "145000", colores: "Negro, Plateado",         stock: "0", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-onix",       visible: "SI" },
+  { id: "6", nombre: "Bruma",      precio: "69000",  colores: "Azul noche",              stock: "6", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-bruma",      visible: "SI" },
+  { id: "7", nombre: "Perla",      precio: "128000", colores: "Blanco perla, Champagne", stock: "3", foto1: "", foto2: "", foto3: "", link_mercadopago: "",                                    visible: "SI" },
+  { id: "8", nombre: "Aurora",     precio: "92000",  colores: "Dorado",                  stock: "2", foto1: "", foto2: "", foto3: "", link_mercadopago: "https://mpago.la/ejemplo-aurora",     visible: "SI" },
 ];
 
 
@@ -39,7 +39,6 @@ const VESTIDOS_EJEMPLO = [
    ========================================================= */
 
 const STOCK_LABEL = { disponible: "Disponible", ultimas: "Últimas unidades", agotado: "Agotado" };
-const TALLE_ORDEN = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "3XL", "4XL", "U", "UNICO", "TALLE UNICO"];
 const COLOR_HEX = [
   ["negro", "#141414"], ["esmeralda", "#0f5e45"], ["perla", "#e8e2d4"], ["marfil", "#ece4d2"],
   ["blanco", "#efebe3"], ["champagne", "#d8c29d"], ["champan", "#d8c29d"], ["dorado", "#c8a55a"],
@@ -53,9 +52,8 @@ const COLOR_HEX = [
 
 const state = {
   products: [],
-  filters: { talles: new Set(), colores: new Set(), min: null, max: null },
+  filters: { colores: new Set(), min: null, max: null },
   current: null,
-  talle: null,
   openedHere: false,
 };
 
@@ -114,21 +112,12 @@ function colorHex(nombre) {
   return hit ? hit[1] : "#8a857d";
 }
 
-function talleRank(t) {
-  const i = TALLE_ORDEN.indexOf(norm(t).replace(/_/g, " ").toUpperCase());
-  if (i >= 0) return i;
-  const n = parseFloat(t);
-  return Number.isFinite(n) ? 100 + n : 1000;
-}
-
 function waLink(msg) {
   return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
 }
 
-function mensajeVestido(p, talle) {
-  return talle
-    ? `Hola, me interesa el vestido ${p.nombre} en talle ${talle}`
-    : `Hola, me interesa el vestido ${p.nombre}`;
+function mensajeVestido(p) {
+  return `Hola, me interesa el vestido ${p.nombre}`;
 }
 
 /* ---------- Fotos: Google Drive → imagen directa ---------- */
@@ -254,7 +243,6 @@ function normalizarFila(raw, i) {
     id: fila.id || norm(nombre) || String(i + 1),
     nombre,
     precio: parsePrecio(fila.precio),
-    talles: splitList(fila.talles).map(t => t.toUpperCase()).sort((a, b) => talleRank(a) - talleRank(b)),
     colores,
     stock,
     estado: stockState(stock),
@@ -286,7 +274,6 @@ function badge(p) {
 
 function pasaFiltros(p) {
   const f = state.filters;
-  if (f.talles.size && !p.talles.some(t => f.talles.has(t))) return false;
   if (f.colores.size && !p.colores.some(c => f.colores.has(norm(c)))) return false;
   if (f.min !== null && p.precio < f.min) return false;
   if (f.max !== null && p.precio > f.max) return false;
@@ -295,7 +282,7 @@ function pasaFiltros(p) {
 
 function filtrosActivos() {
   const f = state.filters;
-  return f.talles.size + f.colores.size + (f.min !== null ? 1 : 0) + (f.max !== null ? 1 : 0);
+  return f.colores.size +(f.min !== null ? 1 : 0) + (f.max !== null ? 1 : 0);
 }
 
 function renderGrid() {
@@ -310,9 +297,7 @@ function renderGrid() {
         <div class="card-media">${imgTag(fotosDe(p)[0], p.nombre, i < 4)}${badge(p)}</div>
         <div class="card-body">
           <h3 class="card-name">${esc(p.nombre)}</h3>
-          <p class="card-price">${formatPrecio(p.precio)}</p>
-          ${p.talles.length ? `<p class="card-sizes">${p.talles.map(esc).join(" · ")}</p>` : ""}
-        </div>
+          <p class="card-price">${formatPrecio(p.precio)}</p>        </div>
       </button>
     </article>`).join("");
   grid.setAttribute("aria-busy", "false");
@@ -335,12 +320,9 @@ function renderGrid() {
 }
 
 function renderFiltros() {
-  const talles = [...new Set(state.products.flatMap(p => p.talles))].sort((a, b) => talleRank(a) - talleRank(b));
   const colores = new Map();
   state.products.forEach(p => p.colores.forEach(c => { if (!colores.has(norm(c))) colores.set(norm(c), c); }));
 
-  $("#fTalles").innerHTML = talles.map(t =>
-    `<button class="chip" type="button" data-talle="${esc(t)}" aria-pressed="${state.filters.talles.has(t)}">${esc(t)}</button>`).join("");
   $("#fColores").innerHTML = [...colores].map(([k, c]) =>
     `<button class="chip" type="button" data-color="${esc(k)}" aria-pressed="${state.filters.colores.has(k)}"><span class="swatch" style="background:${colorHex(c)}"></span>${esc(c)}</button>`).join("");
 
@@ -352,7 +334,7 @@ function renderFiltros() {
 }
 
 function limpiarFiltros() {
-  state.filters = { talles: new Set(), colores: new Set(), min: null, max: null };
+  state.filters = { colores: new Set(), min: null, max: null };
   $("#fMin").value = ""; $("#fMax").value = "";
   renderFiltros();
   renderGrid();
@@ -364,20 +346,20 @@ function renderDetalle() {
   const p = state.current;
   const fotos = fotosDe(p);
   const puedePagar = p.mp && p.estado !== "agotado";
-  const pideTalle = p.talles.length > 1;
+  const wa = esc(waLink(mensajeVestido(p)));
 
   const acciones = puedePagar
-    ? `<a class="btn btn-accent" href="${esc(p.mp)}" target="_blank" rel="noopener" data-needs-talle>Comprar con Mercado Pago</a>
-       <a class="btn btn-ghost" data-wa-producto target="_blank" rel="noopener" data-needs-talle>
+    ? `<a class="btn btn-accent" href="${esc(p.mp)}" target="_blank" rel="noopener">Comprar con Mercado Pago</a>
+       <a class="btn btn-ghost" href="${wa}" target="_blank" rel="noopener">
          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-wa"/></svg>Consultar por WhatsApp</a>`
-    : `<a class="btn btn-accent" data-wa-producto target="_blank" rel="noopener" data-needs-talle>
+    : `<a class="btn btn-accent" href="${wa}" target="_blank" rel="noopener">
          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-wa"/></svg>Consultar por WhatsApp</a>`;
 
   const nota = puedePagar
-    ? "Después de pagar, mandanos el comprobante por WhatsApp con tu talle y coordinamos el retiro o envío."
+    ? "Después de pagar, mandanos el comprobante por WhatsApp y coordinamos el retiro en el local."
     : p.estado === "agotado"
       ? "Este modelo está agotado por ahora. Escribinos y te avisamos si vuelve a entrar o te mostramos opciones similares."
-      : "Escribinos por WhatsApp y te confirmamos disponibilidad, formas de pago y envío.";
+      : "Escribinos por WhatsApp y te confirmamos disponibilidad y formas de pago.";
 
   $("#detailBody").innerHTML = `
     <div class="gallery">
@@ -392,33 +374,14 @@ function renderDetalle() {
       <h2 class="detail-name">${esc(p.nombre)}</h2>
       <p class="detail-price">${formatPrecio(p.precio)}</p>
       ${p.colores.length ? `<p class="detail-meta">Color: <strong>${p.colores.map(esc).join(", ")}</strong></p>` : ""}
-      ${p.talles.length ? `
-        <div class="sizes">
-          <p class="detail-label">Talle <em>Elegí tu talle</em></p>
-          <div class="chips">${p.talles.map(t =>
-            `<button class="chip" type="button" data-pick-talle="${esc(t)}" aria-pressed="${state.talle === t}">${esc(t)}</button>`).join("")}</div>
-        </div>` : ""}
       <div class="detail-actions">${acciones}</div>
       <p class="detail-note">${nota}</p>
     </div>`;
-
-  actualizarLinksDetalle();
-  if (!pideTalle) $$("[data-needs-talle]", $("#detailBody")).forEach(a => a.removeAttribute("data-needs-talle"));
-}
-
-function actualizarLinksDetalle() {
-  const p = state.current;
-  $$("[data-wa-producto]", $("#detailBody")).forEach(a => { a.href = waLink(mensajeVestido(p, state.talle)); });
-  $$("[data-pick-talle]", $("#detailBody")).forEach(b => b.setAttribute("aria-pressed", b.dataset.pickTalle === state.talle));
-  if (state.talle) $(".sizes", $("#detailBody"))?.classList.remove("need");
 }
 
 function abrirDetalle(p) {
   const dlg = $("#detail");
   state.current = p;
-  // Talle preseleccionado: si hay uno solo, o si filtraste por un talle que este vestido tiene
-  const filtrados = [...state.filters.talles].filter(t => p.talles.includes(t));
-  state.talle = p.talles.length === 1 ? p.talles[0] : filtrados.length === 1 ? filtrados[0] : null;
   renderDetalle();
   if (!dlg.open) dlg.showModal();
   document.documentElement.classList.add("lock");
@@ -470,18 +433,6 @@ function conectarEventos() {
   dlg.addEventListener("cancel", e => { e.preventDefault(); cerrarDetalle(); });
   dlg.addEventListener("click", e => { if (e.target === dlg) cerrarDetalle(); });
   $("#detailBody").addEventListener("click", e => {
-    const pick = e.target.closest("[data-pick-talle]");
-    if (pick) { state.talle = pick.dataset.pickTalle; actualizarLinksDetalle(); return; }
-
-    const needs = e.target.closest("[data-needs-talle]");
-    if (needs && !state.talle) {
-      e.preventDefault();
-      const sizes = $(".sizes", $("#detailBody"));
-      sizes.classList.remove("need"); void sizes.offsetWidth; sizes.classList.add("need");
-      sizes.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
-
     const slides = $(".slides", $("#detailBody"));
     const dot = e.target.closest(".dots button");
     if (dot) slides.scrollTo({ left: [...dot.parentNode.children].indexOf(dot) * slides.clientWidth, behavior: "smooth" });
@@ -500,8 +451,7 @@ function conectarEventos() {
   sheet.addEventListener("close", () => document.documentElement.classList.remove("lock"));
   sheet.addEventListener("click", e => {
     if (e.target === sheet || e.target.closest("[data-close]")) { sheet.close(); return; }
-    const t = e.target.closest("[data-talle]"), c = e.target.closest("[data-color]");
-    if (t) toggle(state.filters.talles, t.dataset.talle, t);
+    const c = e.target.closest("[data-color]");
     if (c) toggle(state.filters.colores, c.dataset.color, c);
   });
   $("#filtersClear").addEventListener("click", limpiarFiltros);
