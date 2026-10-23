@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Parisienne&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000; --surface: #121110; --surface-2: #1b1917;
+      --line: #2a2723; --line-strong: #3d3933;
+      --text: #f4f1ec; --muted: #9d978e;
+      --accent: #c8a24e; --danger: #e0786b; --ok: #8fc79a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    [hidden] { display: none !important; }
+    html, body { background: var(--bg); color: var(--text); }
+    body { font-family: "Jost", system-ui, sans-serif; font-weight: 300; font-size: 16px; line-height: 1.45; padding-bottom: 96px; }
+    button, input { font: inherit; color: inherit; }
+    button { background: none; border: 0; cursor: pointer; }
+    img { display: block; }
+
+    /* barra superior */
+    .top {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 16px; background: rgba(0,0,0,.92); border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .brand { color: var(--accent); display: flex; align-items: baseline; gap: 6px; }
+    .brand b { font-family: "Cinzel", serif; font-size: 20px; letter-spacing: .05em; }
+    .brand i { font-family: "Parisienne", cursive; font-style: normal; font-size: 19px; }
+    .brand small { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-left: 6px; }
+    .top a { font-size: 13px; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line-strong); }
+
+    .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
+    .search {
+      width: 100%; min-height: 48px; padding: 0 16px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px; font-size: 16px;
+    }
+    .search:focus { outline: none; border-color: var(--accent); }
+    .summary { font-size: 13px; color: var(--muted); margin: 12px 2px; }
+
+    /* lista */
+    .list { display: grid; gap: 10px; }
+    .item {
+      display: grid; grid-template-columns: 76px 1fr; gap: 12px;
+      padding: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    }
+    .item.oculto { opacity: .55; }
+    .thumb { width: 76px; height: 100px; border-radius: 9px; object-fit: cover; background: var(--surface-2); }
+    .thumb.vacia { display: grid; place-items: center; color: var(--muted); font-size: 11px; text-align: center; }
+    .item-main { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .item-head { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+    .item-name { font-size: 18px; font-weight: 400; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; }
+    .item-price { color: var(--accent); font-weight: 400; }
+    .edit { flex: none; font-size: 13px; padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: 999px; }
+    .item-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: auto; }
+
+    .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 999px; }
+    .stepper button { width: 40px; height: 38px; font-size: 20px; line-height: 1; }
+    .stepper output { min-width: 28px; text-align: center; font-weight: 500; }
+    .stock-label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px; letter-spacing: .06em; }
+    .estado { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .estado.agotado { color: var(--danger); } .estado.ultimas { color: var(--accent); } .estado.disponible { color: var(--ok); }
+
+    /* interruptor */
+    .switch { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .switch input { appearance: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line-strong); position: relative; cursor: pointer; transition: background .2s; }
+    .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .2s; }
+    .switch input:checked { background: var(--accent); }
+    .switch input:checked::after { transform: translateX(18px); }
+
+    /* botón principal flotante */
+    .fab {
+      position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 20;
+      max-width: 608px; margin: 0 auto;
+      min-height: 56px; border-radius: 14px; background: var(--accent); color: #0a0a0a;
+      font-weight: 500; font-size: 16px; letter-spacing: .04em;
+      box-shadow: 0 10px 30px rgba(0,0,0,.6);
+    }
+
+    .empty, .loading { text-align: center; color: var(--muted); padding: 48px 16px; }
+
+    /* formulario (pantalla completa) */
+    .form-screen { position: fixed; inset: 0; z-index: 30; background: var(--bg); overflow-y: auto; padding-bottom: 110px; }
+    .form-top { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 10px 8px; background: rgba(0,0,0,.94); border-bottom: 1px solid var(--line); }
+    .back { width: 44px; height: 44px; font-size: 26px; line-height: 1; }
+    .form-top h2 { font-weight: 400; font-size: 19px; }
+    .field { margin-bottom: 22px; }
+    .field > label, .field > .label { display: block; font-size: 13px; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+    .field .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .input {
+      width: 100%; min-height: 52px; padding: 0 14px;
+      background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; font-size: 17px;
+    }
+    .input:focus { outline: none; border-color: var(--accent); }
+    .money { position: relative; }
+    .money span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .money .input { padding-left: 30px; }
+
+    .photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .slot {
+      position: relative; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden;
+      border: 1px dashed var(--line-strong); background: var(--surface);
+      display: grid; place-items: center; text-align: center; color: var(--muted); font-size: 12px;
+    }
+    .slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .slot .plus { font-size: 28px; line-height: 1; color: var(--accent); display: block; margin-bottom: 4px; }
+    .slot .x {
+      position: absolute; top: 6px; right: 6px; z-index: 2; width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(0,0,0,.7); color: #fff; font-size: 18px; line-height: 1;
+    }
+    .slot .tag { position: absolute; left: 6px; bottom: 6px; z-index: 2; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.7); color: var(--accent); padding: 3px 6px; border-radius: 6px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { min-height: 40px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+    .chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: #000; }
+    .chip .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); }
+    .add-color { display: flex; gap: 8px; margin-top: 10px; }
+    .add-color .input { min-height: 44px; font-size: 15px; }
+    .add-color button { flex: none; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 12px; }
+
+    .big-stepper { display: flex; align-items: center; gap: 0; border: 1px solid var(--line-strong); border-radius: 12px; width: max-content; }
+    .big-stepper button { width: 56px; height: 52px; font-size: 24px; }
+    .big-stepper input { width: 64px; height: 52px; text-align: center; background: transparent; border: 0; font-size: 19px; font-weight: 500; }
+    .big-stepper input:focus { outline: none; }
+
+    .row-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .row-between p { font-size: 15px; }
+    .row-between small { display: block; color: var(--muted); font-size: 12px; }
+
+    .danger { width: 100%; min-height: 48px; margin-top: 8px; color: var(--danger); border: 1px solid rgba(224,120,107,.4); border-radius: 12px; }
+    .save-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(0,0,0,.94); border-top: 1px solid var(--line); }
+    .save-bar .fab { position: static; width: 100%; box-shadow: none; display: block; }
+    .fab:disabled { opacity: .6; }
+
+    /* avisos */
+    .toast {
+      position: fixed; left: 16px; right: 16px; top: calc(12px + env(safe-area-inset-top)); z-index: 50;
+      max-width: 560px; margin: 0 auto; padding: 14px 16px; border-radius: 12px;
+      background: #f4f1ec; color: #111; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      transform: translateY(-140%); transition: transform .3s;
+    }
+    .toast.show { transform: none; }
+    .toast.error { background: #3a1714; color: #ffd9d3; }
+  </style>
+</head>
+<body>
+
+  <header class="top">
+    <div class="brand"><b>FURIA</b><i>Store</i><small>Panel</small></div>
+    <a id="verSitio" target="_blank" rel="noopener" hidden>Ver la página ↗</a>
+  </header>
+
+  <main class="wrap">
+    <input id="buscar" class="search" type="search" placeholder="Buscar vestido…" autocomplete="off">
+    <p id="resumen" class="summary"></p>
+    <div id="lista" class="list"><p class="loading">Cargando vestidos…</p></div>
+  </main>
+
+  <button id="nuevo" class="fab" type="button">+ Agregar vestido</button>
+
+  <!-- Formulario de carga / edición -->
+  <section id="form" class="form-screen" hidden>
+    <div class="form-top">
+      <button class="back" type="button" data-cerrar aria-label="Volver">‹</button>
+      <h2 id="formTitulo">Nuevo vestido</h2>
+    </div>
+    <div class="wrap">
+      <div class="field">
+        <span class="label">Fotos (hasta 3, la primera es la principal)</span>
+        <div id="fotos" class="photos"></div>
+        <input id="archivo" type="file" accept="image/*" hidden>
+      </div>
+
+      <div class="field">
+        <label for="fNombre">Nombre del vestido</label>
+        <input id="fNombre" class="input" type="text" autocomplete="off" placeholder="Ej: Luna">
+      </div>
+
+      <div class="field">
+        <label for="fPrecio">Precio</label>
+        <div class="money"><span>$</span><input id="fPrecio" class="input" type="text" inputmode="numeric" placeholder="85.000"></div>
+      </div>
+
+      <div class="field">
+        <span class="label">Colores (tocá todos los que tenga)</span>
+        <div id="colores" class="chips"></div>
+        <div class="add-color">
+          <input id="otroColor" class="input" type="text" placeholder="Otro color…" autocomplete="off">
+          <button id="agregarColor" type="button">Agregar</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="label">Unidades en stock</span>
+        <div class="big-stepper">
+          <button type="button" data-step="-1" aria-label="Restar">−</button>
+          <input id="fStock" type="number" inputmode="numeric" min="0" value="1">
+          <button type="button" data-step="1" aria-label="Sumar">+</button>
+        </div>
+        <p class="hint">0 = Agotado · 1 o 2 = Últimas unidades</p>
+      </div>
+
+      <div class="field">
+        <label for="fMp">Link de pago de Mercado Pago (opcional)</label>
+        <input id="fMp" class="input" type="url" inputmode="url" placeholder="https://mpago.la/…" autocomplete="off">
+        <p class="hint">Si lo dejás vacío, en la página aparece "Consultar por WhatsApp".</p>
+      </div>
+
+      <div class="field">
+        <div class="row-between">
+          <p>Mostrar en la página<small>Apagalo para ocultarlo sin borrarlo</small></p>
+          <label class="switch"><input id="fVisible" type="checkbox" checked></label>
+        </div>
+      </div>
+
+      <button id="eliminar" class="danger" type="button" hidden>Eliminar vestido</button>
+    </div>
+    <div class="save-bar"><button id="guardar" class="fab" type="button">Guardar</button></div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+<script>
+  const COLORES_BASE = ["Negro", "Blanco", "Champagne", "Dorado", "Plateado", "Rojo", "Bordó", "Verde esmeralda", "Azul noche", "Nude", "Rosa", "Lila"];
+  const COLOR_HEX = [["negro","#141414"],["esmeralda","#0f5e45"],["perla","#e8e2d4"],["blanco","#efebe3"],["champagne","#d8c29d"],["dorado","#c8a55a"],["plateado","#bfc1c6"],["bordo","#5e1624"],["rojo","#a8152b"],["fucsia","#c0246b"],["rosa","#d9a1ad"],["nude","#d4b09a"],["lila","#a68fc6"],["violeta","#5d3d8a"],["verde","#2d5a3d"],["celeste","#9fc3df"],["azul","#1c2950"],["gris","#6f6f72"]];
+
+  const $ = s => document.querySelector(s);
+  const state = { vestidos: [], editando: null, fotos: [], colores: new Set(), ocupado: false };
+
+  // google.script.run como promesa
+  const server = (fn, ...args) => new Promise((ok, fail) =>
+    google.script.run.withSuccessHandler(ok).withFailureHandler(fail)[fn](...args));
+
+  /* ---------- utilidades ---------- */
+  const norm = s => String(s ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const pesos = n => "$" + Number(n || 0).toLocaleString("es-AR");
+  const lista = s => String(s ?? "").split(/[,;]/).map(x => x.trim()).filter(Boolean);
+  const hex = c => (COLOR_HEX.find(([k]) => norm(c).includes(k)) || [, "#8a857d"])[1];
+  const estado = s => { s = Number(s); return s <= 0 ? ["agotado", "Agotado"] : s <= 2 ? ["ultimas", "Últimas unidades"] : ["disponible", "Disponible"]; };
+  const visible = v => norm(v) !== "no";
+
+  function miniatura(url) {
+    url = String(url || "").trim();
+    const m = url.match(/\/d\/([\w-]{15,})/) || url.match(/[?&]id=([\w-]{15,})/);
+    return m ? `https://lh3.googleusercontent.com/d/${m[1]}=w400` : url;
+  }
+
+  let toastTimer;
+  function aviso(texto, error = false) {
+    const t = $("#toast");
+    t.textContent = texto;
+    t.classList.toggle("error", error);
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), error ? 6000 : 3500);
+  }
+  const mensajeError = e => (e && e.message ? e.message : String(e)).replace(/^Exception:\s*/, "");
+
+  /* ---------- lista ---------- */
+  async function cargar() {
+    try {
+      const datos = await server("cargarPanel");
+      state.vestidos = datos.vestidos;
+      if (datos.sitio) { $("#verSitio").href = datos.sitio; $("#verSitio").hidden = false; }
+      pintarLista();
+    } catch (e) {
+      $("#lista").innerHTML = `<p class="empty">No se pudo cargar la planilla.<br>${esc(mensajeError(e))}</p>`;
+    }
+  }
+
+  function pintarLista() {
+    const q = norm($("#buscar").value);
+    const vs = state.vestidos.filter(v => !q || norm(v.nombre).includes(q) || norm(v.colores).includes(q));
+    const total = state.vestidos.length;
+    const ocultos = state.vestidos.filter(v => !visible(v.visible)).length;
+    $("#resumen").textContent = `${total} ${total === 1 ? "vestido" : "vestidos"}` + (ocultos ? ` · ${ocultos} oculto${ocultos > 1 ? "s" : ""}` : "");
+
+    if (!vs.length) {
+      $("#lista").innerHTML = `<p class="empty">${total ? "No hay vestidos con esa búsqueda." : "Todavía no hay vestidos. Tocá “Agregar vestido” para cargar el primero."}</p>`;
+      return;
+    }
+    $("#lista").innerHTML = vs.map(v => {
+      const [cls, txt] = estado(v.stock);
+      const foto = miniatura(v.foto1);
+      return `
+        <article class="item ${visible(v.visible) ? "" : "oculto"}" data-fila="${v.fila}">
+          ${foto ? `<img class="thumb" src="${esc(foto)}" alt="" loading="lazy">` : `<div class="thumb vacia">Sin foto</div>`}
+          <div class="item-main">
+            <div class="item-head">
+              <div style="min-width:0">
+                <p class="item-name">${esc(v.nombre)}</p>
+                <p class="item-price">${pesos(v.precio)}</p>
+              </div>
+              <button class="edit" type="button" data-editar>Editar</button>
+            </div>
+            <div class="item-row">
+              <div>
+                <span class="stock-label">STOCK · <span class="estado ${cls}">${txt}</span></span>
+                <span class="stepper">
+                  <button type="button" data-stock="-1" aria-label="Restar una unidad">−</button>
+                  <output>${Number(v.stock) || 0}</output>
+                  <button type="button" data-stock="1" aria-label="Sumar una unidad">+</button>
+                </span>
+              </div>
+              <label class="switch">${visible(v.visible) ? "Visible" : "Oculto"}<input type="checkbox" data-visible ${visible(v.visible) ? "checked" : ""}></label>
+            </div>
+          </div>
+        </article>`;
+    }).join("");
+  }
+
+  const vestidoDe = el => state.vestidos.find(v => v.fila === Number(el.closest("[data-fila]").dataset.fila));
+
+  $("#lista").addEventListener("click", async e => {
+    const btnStock = e.target.closest("[data-stock]");
+    if (btnStock) {
+      const v = vestidoDe(btnStock);
+      const anterior = Number(v.stock) || 0;
+      const nuevo = Math.max(0, anterior + Number(btnStock.dataset.stock));
+      if (nuevo === anterior) return;
+      v.stock = nuevo; pintarLista();
+      try { await server("cambiarStock", v.fila, v.nombre, nuevo); }
+      catch (err) { v.stock = anterior; pintarLista(); aviso(mensajeError(err), true); }
+      return;
+    }
+    if (e.target.closest("[data-editar]")) abrirForm(vestidoDe(e.target));
+  });
+
+  $("#lista").addEventListener("change", async e => {
+    if (!e.target.matches("[data-visible]")) return;
+    const v = vestidoDe(e.target);
+    const anterior = v.visible;
+    v.visible = e.target.checked ? "SI" : "NO"; pintarLista();
+    try {
+      await server("cambiarVisible", v.fila, v.nombre, e.target.checked);
+      aviso(e.target.checked ? `${v.nombre} se muestra en la página` : `${v.nombre} quedó oculto`);
+    } catch (err) { v.visible = anterior; pintarLista(); aviso(mensajeError(err), true); }
+  });
+
+  $("#buscar").addEventListener("input", pintarLista);
+
+  /* ---------- formulario ---------- */
+  function abrirForm(v) {
+    state.editando = v || null;
+    state.fotos = v ? [v.foto1, v.foto2, v.foto3].filter(Boolean).map(url => ({ url })) : [];
+    state.colores = new Set(v ? lista(v.colores) : []);
+    $("#formTitulo").textContent = v ? "Editar vestido" : "Nuevo vestido";
+    $("#fNombre").value = v ? v.nombre : "";
+    $("#fPrecio").value = v && v.precio ? Number(v.precio).toLocaleString("es-AR") : "";
+    $("#fStock").value = v ? (Number(v.stock) || 0) : 1;
+    $("#fMp").value = v ? v.link_mercadopago : "";
+    $("#fVisible").checked = v ? visible(v.visible) : true;
+    $("#eliminar").hidden = !v;
+    $("#otroColor").value = "";
+    pintarFotos(); pintarColores();
+    $("#form").hidden = false;
+    $("#form").scrollTop = 0;
+    document.body.style.overflow = "hidden";
+  }
+
+  function cerrarForm() {
+    $("#form").hidden = true;
+    document.body.style.overflow = "";
+  }
+  document.querySelectorAll("[data-cerrar]").forEach(b => b.addEventListener("click", () => cerrarForm()));
+  $("#nuevo").addEventListener("click", () => abrirForm(null));
+
+  // fotos
+  function pintarFotos() {
+    const slots = [0, 1, 2].map(i => {
+      const f = state.fotos[i];
+      if (f) return `<div class="slot"><img src="${esc(f.data || miniatura(f.url))}" alt="">${i === 0 ? '<span class="tag">Principal</span>' : ""}<button class="x" type="button" data-quitar="${i}" aria-label="Quitar foto">×</button></div>`;
+      if (i === state.fotos.length) return `<button class="slot" type="button" data-agregar-foto><span><span class="plus">+</span>Agregar foto</span></button>`;
+      return `<div class="slot" style="opacity:.35"></div>`;
+    });
+    $("#fotos").innerHTML = slots.join("");
+  }
+  $("#fotos").addEventListener("click", e => {
+    if (e.target.closest("[data-agregar-foto]")) $("#archivo").click();
+    const q = e.target.closest("[data-quitar]");
+    if (q) { state.fotos.splice(Number(q.dataset.quitar), 1); pintarFotos(); }
+  });
+  $("#archivo").addEventListener("change", async e => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    try { state.fotos.push({ data: await achicar(file) }); pintarFotos(); }
+    catch { aviso("No se pudo leer esa foto. Probá con otra.", true); }
+  });
+
+  // Achica la foto en el celular para que suba rápido (máx. 1600 px)
+  function achicar(file) {
+    return new Promise((ok, fail) => {
+      const img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(img.src);
+        ok(c.toDataURL("image/jpeg", 0.85));
+      };
+      img.onerror = fail;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  // colores
+  function pintarColores() {
+    const todos = [...new Set([...COLORES_BASE, ...state.vestidos.flatMap(v => lista(v.colores)), ...state.colores].map(c => c.charAt(0).toUpperCase() + c.slice(1)))];
+    const unicos = [];
+    todos.forEach(c => { if (!unicos.some(u => norm(u) === norm(c))) unicos.push(c); });
+    const elegido = c => [...state.colores].some(s => norm(s) === norm(c));
+    $("#colores").innerHTML = unicos.map(c =>
+      `<button class="chip" type="button" data-color="${esc(c)}" aria-pressed="${elegido(c)}"><span class="dot" style="background:${hex(c)}"></span>${esc(c)}</button>`).join("");
+  }
+  $("#colores").addEventListener("click", e => {
+    const b = e.target.closest("[data-color]");
+    if (!b) return;
+    const c = b.dataset.color;
+    const ya = [...state.colores].find(s => norm(s) === norm(c));
+    ya ? state.colores.delete(ya) : state.colores.add(c);
+    b.setAttribute("aria-pressed", !ya);
+  });
+  function agregarColor() {
+    const c = $("#otroColor").value.trim();
+    if (!c) return;
+    state.colores.add(c.charAt(0).toUpperCase() + c.slice(1));
+    $("#otroColor").value = "";
+    pintarColores();
+  }
+  $("#agregarColor").addEventListener("click", agregarColor);
+  $("#otroColor").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); agregarColor(); } });
+
+  // precio con puntos de miles mientras se escribe
+  $("#fPrecio").addEventListener("input", e => {
+    const n = e.target.value.replace(/\D/g, "");
+    e.target.value = n ? Number(n).toLocaleString("es-AR") : "";
+  });
+
+  // stock
+  document.querySelectorAll("[data-step]").forEach(b => b.addEventListener("click", () => {
+    const i = $("#fStock");
+    i.value = Math.max(0, (parseInt(i.value, 10) || 0) + Number(b.dataset.step));
+  }));
+
+  // guardar
+  $("#guardar").addEventListener("click", async () => {
+    if (state.ocupado) return;
+    const nombre = $("#fNombre").value.trim();
+    const precio = $("#fPrecio").value.replace(/\D/g, "");
+    if (!nombre) { aviso("Poné el nombre del vestido.", true); $("#fNombre").focus(); return; }
+    if (!precio) { aviso("Poné el precio.", true); $("#fPrecio").focus(); return; }
+    const mp = $("#fMp").value.trim();
+    if (mp && !/^https?:\/\//i.test(mp)) { aviso("El link de Mercado Pago tiene que empezar con https://", true); $("#fMp").focus(); return; }
+
+    const btn = $("#guardar");
+    state.ocupado = true; btn.disabled = true;
+    try {
+      const links = [];
+      for (let i = 0; i < state.fotos.length; i++) {
+        const f = state.fotos[i];
+        if (f.url) { links.push(f.url); continue; }
+        btn.textContent = `Subiendo foto ${i + 1} de ${state.fotos.length}…`;
+        f.url = await server("subirFoto", f.data.split(",")[1], `${nombre} ${i + 1}.jpg`);
+        links.push(f.url);
+      }
+      btn.textContent = "Guardando…";
+      const v = state.editando;
+      await server("guardarVestido", {
+        fila: v ? v.fila : null,
+        nombreOriginal: v ? v.nombre : "",
+        nombre, precio,
+        colores: [...state.colores].join(", "),
+        stock: $("#fStock").value,
+        foto1: links[0] || "", foto2: links[1] || "", foto3: links[2] || "",
+        link_mercadopago: mp,
+        visible: $("#fVisible").checked,
+      });
+      cerrarForm();
+      aviso(`${nombre} guardado ✓ En unos 5 minutos se ve en la página.`);
+      await cargar();
+    } catch (err) {
+      aviso(mensajeError(err), true);
+    } finally {
+      state.ocupado = false; btn.disabled = false; btn.textContent = "Guardar";
+    }
+  });
+
+  // eliminar
+  $("#eliminar").addEventListener("click", async () => {
+    const v = state.editando;
+    if (!v || !confirm(`¿Eliminar "${v.nombre}" de la planilla? Esto no se puede deshacer.\n\nSi solo querés que no aparezca en la página, mejor apagá "Mostrar en la página".`)) return;
+    try {
+      await server("eliminarVestido", v.fila, v.nombre);
+      cerrarForm();
+      aviso(`${v.nombre} eliminado`);
+      await cargar();
+    } catch (err) { aviso(mensajeError(err), true); }
+  });
+
+  cargar();
+</script>
+</body>
+</html>
