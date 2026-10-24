@@ -127,6 +127,20 @@
     .big-stepper input { width: 64px; height: 52px; text-align: center; background: transparent; border: 0; font-size: 19px; font-weight: 500; }
     .big-stepper input:focus { outline: none; }
 
+    .label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .link-btn { font-size: 13px; color: var(--accent); border-bottom: 1px solid currentColor; padding: 0; margin-bottom: 8px; }
+    .chip .quitar { display: none; margin-left: 2px; width: 22px; height: 22px; border-radius: 50%; background: rgba(224,120,107,.18); color: var(--danger); font-size: 15px; line-height: 22px; text-align: center; }
+    .editando-colores .chip .quitar { display: inline-block; }
+    .editando-colores .chip { border-style: dashed; }
+    .color-nuevo { margin-top: 18px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .color-nuevo .label { margin-bottom: 10px; }
+    .paleta { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 8px; }
+    .paleta button { aspect-ratio: 1; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+    .paleta button[aria-pressed="true"] { outline: 2px solid var(--text); outline-offset: 2px; }
+    .picker { position: relative; flex: none; width: 44px; height: 44px; border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--line-strong); }
+    .picker input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+    .picker .muestra { position: absolute; inset: 6px; border-radius: 8px; pointer-events: none; }
+
     .talle-rows { display: grid; gap: 8px; margin-top: 14px; }
     .talle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 8px 8px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
     .talle-row b { font-weight: 500; font-size: 17px; min-width: 48px; }
@@ -195,11 +209,24 @@
       </div>
 
       <div class="field">
-        <span class="label">Colores (tocá todos los que tenga)</span>
+        <div class="label-row">
+          <span class="label">Colores (tocá todos los que tenga)</span>
+          <button id="editarColores" class="link-btn" type="button">Quitar colores</button>
+        </div>
         <div id="colores" class="chips"></div>
-        <div class="add-color">
-          <input id="otroColor" class="input" type="text" placeholder="Otro color…" autocomplete="off">
-          <button id="agregarColor" type="button">Agregar</button>
+        <p id="coloresHint" class="hint" hidden>Tocá la × para sacar un color de la paleta. Solo se puede si ningún vestido publicado lo usa.</p>
+
+        <div class="color-nuevo">
+          <span class="label">Agregar un color nuevo</span>
+          <div id="paleta" class="paleta"></div>
+          <div class="add-color">
+            <label class="picker" title="Elegir otro tono">
+              <input id="colorPicker" type="color" value="#c8a24e" aria-label="Elegir otro tono">
+              <span id="colorMuestra" class="muestra"></span>
+            </label>
+            <input id="otroColor" class="input" type="text" placeholder="Nombre (ej: Verde agua)" autocomplete="off">
+            <button id="agregarColor" type="button">Agregar</button>
+          </div>
         </div>
       </div>
 
@@ -253,11 +280,10 @@
     if (l) l.innerHTML = `<p class="empty">Hubo un error en el panel: ${String(e.message).replace(/</g, "&lt;")}</p>`;
   });
 
-  const COLORES_BASE = ["Negro", "Blanco", "Champagne", "Dorado", "Plateado", "Rojo", "Bordó", "Verde esmeralda", "Azul noche", "Nude", "Rosa", "Lila"];
   const COLOR_HEX = [["negro","#141414"],["esmeralda","#0f5e45"],["perla","#e8e2d4"],["blanco","#efebe3"],["champagne","#d8c29d"],["dorado","#c8a55a"],["plateado","#bfc1c6"],["bordo","#5e1624"],["rojo","#a8152b"],["fucsia","#c0246b"],["rosa","#d9a1ad"],["nude","#d4b09a"],["lila","#a68fc6"],["violeta","#5d3d8a"],["verde","#2d5a3d"],["celeste","#9fc3df"],["azul","#1c2950"],["gris","#6f6f72"]];
 
   const $ = s => document.querySelector(s);
-  const state = { vestidos: [], editando: null, fotos: [], colores: new Set(), talles: [], ocupado: false };
+  const state = { vestidos: [], paleta: [], editando: null, fotos: [], colores: new Set(), talles: [], ocupado: false };
 
   // google.script.run como promesa
   const server = (fn, ...args) => new Promise((ok, fail) =>
@@ -268,7 +294,10 @@
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const pesos = n => "$" + Number(n || 0).toLocaleString("es-AR");
   const lista = s => String(s ?? "").split(/[,;]/).map(x => x.trim()).filter(Boolean);
-  const hex = c => (COLOR_HEX.find(([k]) => norm(c).includes(k)) || [, "#8a857d"])[1];
+  const hex = c => {
+    const p = (state.paleta || []).find(x => norm(x.nombre) === norm(c));
+    return p ? p.hex : (COLOR_HEX.find(([k]) => norm(c).includes(k)) || [, "#8a857d"])[1];
+  };
   const estado = s => { s = Number(s); return s <= 0 ? ["agotado", "Agotado"] : s <= 2 ? ["ultimas", "Últimas unidades"] : ["disponible", "Disponible"]; };
   const visible = v => norm(v) !== "no";
 
@@ -319,6 +348,7 @@
       const datos = await server("cargarPanel");
       clearTimeout(demora);
       state.vestidos = datos.vestidos;
+      state.paleta = datos.colores || [];
       if (datos.sitio) { $("#verSitio").href = datos.sitio; $("#verSitio").hidden = false; }
       pintarLista();
     } catch (e) {
@@ -416,7 +446,8 @@
     $("#fVisible").checked = v ? visible(v.visible) : true;
     $("#eliminar").hidden = !v;
     $("#otroColor").value = "";
-    pintarFotos(); pintarColores();
+    state.quitandoColores = false;
+    pintarFotos(); pintarColores(); pintarPaleta();
     $("#form").hidden = false;
     $("#form").scrollTop = 0;
     document.body.style.overflow = "hidden";
@@ -469,16 +500,53 @@
     });
   }
 
-  // colores
+  /* colores: la paleta se guarda en la pestaña "Colores" de la planilla */
+  const PALETA_SUGERIDA = [
+    ["Negro", "#141414"], ["Blanco", "#f3efe6"], ["Marfil", "#ece4d2"], ["Champagne", "#d8c29d"],
+    ["Dorado", "#c8a55a"], ["Plateado", "#bfc1c6"], ["Nude", "#d4b09a"], ["Rosa", "#d9a1ad"],
+    ["Rosa viejo", "#b98289"], ["Fucsia", "#c0246b"], ["Rojo", "#a8152b"], ["Bordó", "#5e1624"],
+    ["Lila", "#a68fc6"], ["Violeta", "#5d3d8a"], ["Celeste", "#9fc3df"], ["Azul francia", "#2f4fa3"],
+    ["Azul noche", "#1c2950"], ["Verde agua", "#7fc4b4"], ["Verde esmeralda", "#0f5e45"], ["Verde oliva", "#6b6b3a"],
+    ["Amarillo", "#e2c044"], ["Naranja", "#d0612a"], ["Marrón", "#5a3b2a"], ["Gris", "#6f6f72"],
+  ];
+  state.nuevoHex = "#c8a24e";
+  state.quitandoColores = false;
+
   function pintarColores() {
-    const todos = [...new Set([...COLORES_BASE, ...state.vestidos.flatMap(v => lista(v.colores)), ...state.colores].map(c => c.charAt(0).toUpperCase() + c.slice(1)))];
-    const unicos = [];
-    todos.forEach(c => { if (!unicos.some(u => norm(u) === norm(c))) unicos.push(c); });
+    const items = state.paleta.map(c => ({ nombre: c.nombre, hex: c.hex, enPaleta: true }));
+    state.colores.forEach(c => { if (!items.some(i => norm(i.nombre) === norm(c))) items.push({ nombre: c, hex: hex(c), enPaleta: false }); });
     const elegido = c => [...state.colores].some(s => norm(s) === norm(c));
-    $("#colores").innerHTML = unicos.map(c =>
-      `<button class="chip" type="button" data-color="${esc(c)}" aria-pressed="${elegido(c)}"><span class="dot" style="background:${hex(c)}"></span>${esc(c)}</button>`).join("");
+    $("#colores").classList.toggle("editando-colores", state.quitandoColores);
+    $("#colores").innerHTML = items.length ? items.map(c =>
+      `<button class="chip" type="button" data-color="${esc(c.nombre)}" aria-pressed="${elegido(c.nombre)}"><span class="dot" style="background:${esc(c.hex)}"></span>${esc(c.nombre)}${c.enPaleta ? `<span class="quitar" data-quitar-color="${esc(c.nombre)}" aria-label="Quitar ${esc(c.nombre)}">×</span>` : ""}</button>`).join("")
+      : `<p class="hint">Todavía no hay colores. Agregá el primero acá abajo.</p>`;
+    $("#coloresHint").hidden = !state.quitandoColores;
+    $("#editarColores").textContent = state.quitandoColores ? "Listo" : "Quitar colores";
   }
-  $("#colores").addEventListener("click", e => {
+
+  function pintarPaleta() {
+    $("#paleta").innerHTML = PALETA_SUGERIDA.map(([n, h]) =>
+      `<button type="button" data-hex="${h}" data-nombre="${esc(n)}" title="${esc(n)}" aria-label="${esc(n)}" aria-pressed="${state.nuevoHex === h}" style="background:${h}"></button>`).join("");
+    $("#colorMuestra").style.background = state.nuevoHex;
+    $("#colorPicker").value = state.nuevoHex;
+  }
+
+  $("#colores").addEventListener("click", async e => {
+    const q = e.target.closest("[data-quitar-color]");
+    if (q && state.quitandoColores) {
+      e.stopPropagation();
+      const nombre = q.dataset.quitarColor;
+      const usan = state.vestidos.filter(v => visible(v.visible) && lista(v.colores).some(c => norm(c) === norm(nombre))).map(v => v.nombre);
+      if (usan.length) { aviso(`No se puede quitar "${nombre}": lo usa${usan.length > 1 ? "n" : ""} ${usan.join(", ")}.`, true); return; }
+      try {
+        state.paleta = await server("eliminarColor", nombre);
+        [...state.colores].forEach(c => { if (norm(c) === norm(nombre)) state.colores.delete(c); });
+        pintarColores();
+        aviso(`Se quitó "${nombre}" de la paleta`);
+      } catch (err) { aviso(mensajeError(err), true); }
+      return;
+    }
+    if (state.quitandoColores) return;
     const b = e.target.closest("[data-color]");
     if (!b) return;
     const c = b.dataset.color;
@@ -486,12 +554,31 @@
     ya ? state.colores.delete(ya) : state.colores.add(c);
     b.setAttribute("aria-pressed", !ya);
   });
-  function agregarColor() {
-    const c = $("#otroColor").value.trim();
-    if (!c) return;
-    state.colores.add(c.charAt(0).toUpperCase() + c.slice(1));
-    $("#otroColor").value = "";
-    pintarColores();
+  $("#editarColores").addEventListener("click", () => { state.quitandoColores = !state.quitandoColores; pintarColores(); });
+
+  $("#paleta").addEventListener("click", e => {
+    const b = e.target.closest("[data-hex]");
+    if (!b) return;
+    state.nuevoHex = b.dataset.hex;
+    if (!$("#otroColor").value.trim() || PALETA_SUGERIDA.some(([n]) => n === $("#otroColor").value.trim())) $("#otroColor").value = b.dataset.nombre;
+    pintarPaleta();
+  });
+  $("#colorPicker").addEventListener("input", e => { state.nuevoHex = e.target.value; pintarPaleta(); });
+
+  async function agregarColor() {
+    const nombre = $("#otroColor").value.trim();
+    if (!nombre) { aviso("Poné el nombre del color.", true); $("#otroColor").focus(); return; }
+    const btn = $("#agregarColor");
+    btn.disabled = true;
+    try {
+      state.paleta = await server("guardarColor", nombre, state.nuevoHex);
+      const guardado = state.paleta.find(c => norm(c.nombre) === norm(nombre));
+      if (guardado) state.colores.add(guardado.nombre);
+      $("#otroColor").value = "";
+      pintarColores();
+      aviso(`"${nombre}" quedó en la paleta`);
+    } catch (err) { aviso(mensajeError(err), true); }
+    finally { btn.disabled = false; }
   }
   $("#agregarColor").addEventListener("click", agregarColor);
   $("#otroColor").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); agregarColor(); } });

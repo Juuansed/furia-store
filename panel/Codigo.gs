@@ -15,7 +15,17 @@ const CARPETA_FOTOS = "Furia Store - Fotos";
 // 👉 Dirección de la página (opcional). Si la ponés, el panel muestra un botón "Ver la página".
 const SITIO_URL = "";
 
-const CAMPOS = ["nombre", "precio", "talles", "colores", "stock", "foto1", "foto2", "foto3", "link_mercadopago", "visible"];
+// 👉 Pestaña donde se guarda la paleta de colores (se crea sola)
+const HOJA_COLORES = "Colores";
+
+const CAMPOS = ["nombre", "precio", "talles", "colores", "colores_hex", "stock", "foto1", "foto2", "foto3", "link_mercadopago", "visible"];
+
+// Colores con los que arranca la paleta la primera vez
+const COLORES_INICIALES = [
+  ["Negro", "#141414"], ["Blanco", "#f3efe6"], ["Champagne", "#d8c29d"], ["Dorado", "#c8a55a"],
+  ["Plateado", "#bfc1c6"], ["Rojo", "#a8152b"], ["Bordó", "#5e1624"], ["Verde esmeralda", "#0f5e45"],
+  ["Azul noche", "#1c2950"], ["Nude", "#d4b09a"], ["Rosa", "#d9a1ad"], ["Lila", "#a68fc6"],
+];
 
 
 /* ---------- Página del panel ---------- */
@@ -34,10 +44,20 @@ function hoja_() {
   return ss.getSheetByName(HOJA) || ss.getSheets()[0];
 }
 
-// Si la planilla todavía no tiene la columna "talles", la agrega al final
+// Si a la planilla le faltan las columnas nuevas ("talles", "colores_hex"), las agrega al final
 function asegurarTalles_(sh) {
-  const titulos = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(t => String(t).trim().toLowerCase());
-  if (!titulos.includes("talles")) sh.getRange(1, sh.getLastColumn() + 1).setValue("talles");
+  ["talles", "colores_hex"].forEach(nombre => {
+    const titulos = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(t => String(t).trim().toLowerCase());
+    if (!titulos.includes(nombre)) sh.getRange(1, sh.getLastColumn() + 1).setValue(nombre);
+  });
+}
+
+function norm_(s) {
+  return String(s || "").trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
+}
+
+function listaColores_(texto) {
+  return String(texto || "").split(/[,;]/).map(x => x.trim()).filter(Boolean);
 }
 
 // "S:2, M:0, L:1" → suma de unidades (o null si no hay cantidades)
@@ -72,7 +92,70 @@ function cargarPanel() {
     if (col.id) v.id = r[col.id - 1];
     if (String(v.nombre).trim()) vestidos.push(v);
   });
-  return { vestidos, sitio: SITIO_URL };
+  return { vestidos, colores: leerPaleta_(), sitio: SITIO_URL };
+}
+
+
+/* ---------- Paleta de colores ---------- */
+
+// Devuelve la pestaña "Colores"; si no existe la crea con los colores iniciales
+function hojaColores_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(HOJA_COLORES);
+  if (!sh) {
+    sh = ss.insertSheet(HOJA_COLORES);
+    sh.getRange(1, 1, 1, 2).setValues([["nombre", "hex"]]).setFontWeight("bold");
+    sh.getRange(2, 1, COLORES_INICIALES.length, 2).setValues(COLORES_INICIALES);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+function leerPaleta_() {
+  const sh = hojaColores_();
+  const n = sh.getLastRow() - 1;
+  if (n < 1) return [];
+  return sh.getRange(2, 1, n, 2).getValues()
+    .filter(r => String(r[0]).trim())
+    .map(r => ({ nombre: String(r[0]).trim(), hex: String(r[1]).trim() || "#8a857d" }));
+}
+
+// Agrega un color nuevo o le cambia el tono a uno que ya existe (mismo nombre)
+function guardarColor(nombre, hex) {
+  nombre = String(nombre || "").trim();
+  hex = String(hex || "").trim().toLowerCase();
+  if (!nombre) throw new Error("Poné el nombre del color.");
+  if (!/^#[0-9a-f]{6}$/.test(hex)) throw new Error("Elegí un color de la paleta.");
+  return conLock_(() => {
+    const sh = hojaColores_();
+    const paleta = leerPaleta_();
+    const i = paleta.findIndex(c => norm_(c.nombre) === norm_(nombre));
+    if (i >= 0) sh.getRange(i + 2, 2).setValue(hex);
+    else sh.appendRow([nombre.charAt(0).toUpperCase() + nombre.slice(1), hex]);
+    return leerPaleta_();
+  });
+}
+
+// Solo se puede quitar un color si ningún vestido publicado (visible) lo usa
+function eliminarColor(nombre) {
+  return conLock_(() => {
+    const sh = hoja_(), col = columnas_(sh);
+    const filas = sh.getMaxRows() - 1;
+    const datos = sh.getRange(2, 1, filas, sh.getLastColumn()).getValues();
+    const usan = datos
+      .filter(r => String(r[col.nombre - 1]).trim())
+      .filter(r => norm_(r[col.visible - 1]) !== "no")
+      .filter(r => listaColores_(r[col.colores - 1]).some(c => norm_(c) === norm_(nombre)))
+      .map(r => String(r[col.nombre - 1]).trim());
+    if (usan.length) {
+      throw new Error(`No se puede quitar "${nombre}": lo usa${usan.length > 1 ? "n" : ""} ${usan.join(", ")}. Cambiá el color de ese vestido u ocultalo primero.`);
+    }
+    const shc = hojaColores_();
+    const paleta = leerPaleta_();
+    const i = paleta.findIndex(c => norm_(c.nombre) === norm_(nombre));
+    if (i >= 0) shc.deleteRow(i + 2);
+    return leerPaleta_();
+  });
 }
 
 
@@ -110,11 +193,15 @@ function guardarVestido(v) {
     }
     const talles = String(v.talles || "").trim();
     const total = sumarTalles_(talles);
+    const colores = listaColores_(v.colores);
+    const paleta = leerPaleta_();
+    const hexDe = c => (paleta.find(p => norm_(p.nombre) === norm_(c)) || {}).hex || "";
     const valores = {
       nombre,
       precio,
       talles,
-      colores: String(v.colores || "").trim(),
+      colores: colores.join(", "),
+      colores_hex: colores.map(hexDe).join(", "),
       stock: total !== null ? total : Math.max(0, parseInt(v.stock, 10) || 0),
       foto1: v.foto1 || "", foto2: v.foto2 || "", foto3: v.foto3 || "",
       link_mercadopago: String(v.link_mercadopago || "").trim(),

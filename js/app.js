@@ -15,7 +15,7 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQdI1Clk1KDl3S
 const WHATSAPP_NUMERO = "5491123866890";
 
 // 👉 INSTAGRAM: el usuario, sin @
-const INSTAGRAM_USUARIO = "furiastore";
+const INSTAGRAM_USUARIO = "furiapacheco";
 
 
 /* =========================================================
@@ -109,8 +109,12 @@ function stockState(n) {
   return "disponible";
 }
 
+// Colores elegidos en la paleta del panel (columna colores_hex); si no hay, se adivina por el nombre
+const HEX_PALETA = new Map();
+
 function colorHex(nombre) {
   const k = norm(nombre);
+  if (HEX_PALETA.has(k)) return HEX_PALETA.get(k);
   const hit = COLOR_HEX.find(([key]) => k.includes(key));
   return hit ? hit[1] : "#8a857d";
 }
@@ -262,6 +266,9 @@ function normalizarFila(raw, i) {
   const conCantidad = talles.filter(t => t.stock !== null);
   const stock = conCantidad.length ? conCantidad.reduce((s, t) => s + t.stock, 0) : parseStock(fila.stock);
   const colores = splitList(fila.colores).map(capitalize);
+  splitList(fila.colores_hex).forEach((h, j) => {
+    if (colores[j] && /^#[0-9a-f]{6}$/i.test(h)) HEX_PALETA.set(norm(colores[j]), h);
+  });
 
   return {
     id: fila.id || norm(nombre) || String(i + 1),
